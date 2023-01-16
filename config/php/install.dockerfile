@@ -1,6 +1,4 @@
-# magento2.4-infra-docker
-
-`bin/magento setup:install \
+bin/magento setup:install \
 --base-url=http://magexto.local \
 --db-host=mysql \
 --db-name=magento \
@@ -20,5 +18,4 @@
 --elasticsearch-host=elasticsearch \
 --elasticsearch-port=9200 \
 --elasticsearch-index-prefix=magento2 \
---elasticsearch-timeout=15`
-
+--elasticsearch-timeout=15

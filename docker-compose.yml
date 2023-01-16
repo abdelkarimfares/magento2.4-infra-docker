@@ -1,13 +1,15 @@
 version: '3'
 services:
    web:
-      image: webdevops/php-apache-dev:8.1-alpine
+      build:
+        context: ./config/php
+        dockerfile: Dockerfile
       container_name: web
       restart: always
       user: application
       environment:
         - WEB_ALIAS_DOMAIN=magexto.local
-        - WEB_DOCUMENT_ROOT=/app/pub
+        - WEB_DOCUMENT_ROOT=/app/htdocs/pub
         - PHP_DATE_TIMEZONE=EST
         - PHP_DISPLAY_ERRORS=1
         - PHP_MEMORY_LIMIT=2048M
@@ -16,6 +18,7 @@ services:
         - PHP_UPLOAD_MAX_FILESIZE=1024M
       volumes:
         - ./magento:/app:cached
+        - ./config/php:/usr/local/etc/php
       ports:
         - "80:80"
         - "443:443"
@@ -23,7 +26,7 @@ services:
       links:
         - mysql
       networks:
-      - mynet
+        - mynet
 
    elasticsearch:
       image: elasticsearch:7.17.8
@@ -37,20 +40,24 @@ services:
         discovery.type: single-node
 
    mysql:
-       image: mariadb:10
+       image: mysql:8.0.31
        container_name: mysql
        restart: always
+       networks:
+        - mynet
        ports:
-         - "3307:3306"
+         - "3306:3306"
        environment:
          - MYSQL_ROOT_PASSWORD=root
          - MYSQL_DATABASE=magento
        volumes:
-         - db-data:/var/lib/mysql
+         - dbdata:/var/lib/mysql
 
    phpmyadmin:
        container_name: phpmyadmin
        restart: always
+       networks:
+         - mynet
        image: phpmyadmin/phpmyadmin:latest
        environment:
          - MYSQL_ROOT_PASSWORD=root
@@ -67,5 +74,5 @@ networks:
         driver: bridge
 
 volumes:
-   db-data:
+   dbdata:
        external: false
